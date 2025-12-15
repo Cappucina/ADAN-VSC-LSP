@@ -77,8 +77,6 @@ server_connection.onDidChangeConfiguration(change => {
             (change.settings.adnLanguageServer || default_settings)
         );
     }
-
-    documents.all().forEach(validate_text_document);
 });
 
 function get_document_settings(resource: string): Thenable<ServerSettings> {
@@ -102,59 +100,6 @@ function get_document_settings(resource: string): Thenable<ServerSettings> {
 documents.onDidClose(element => {
     document_settings.delete(element.document.uri);
 });
-
-documents.onDidChangeContent(change => {
-    validate_text_document(change.document);
-});
-
-async function validate_text_document(text_document: TextDocument): Promise<void> {
-    let settings = await get_document_settings(text_document.uri);
-    let text = text_document.getText();
-    let pattern = /\b[A-Z]{2,}\b/g;
-    let m: RegExpExecArray | null;
-    let problems = 0;
-    let diagnostics: Diagnostic[] = [];
-
-    while ((m = pattern.exec(text)) && problems < 1000) {
-        problems++;
-
-        let diagnostic: Diagnostic = {
-            severity: DiagnosticSeverity.Warning,
-            range: {
-                start: text_document.positionAt(m.index),
-                end: text_document.positionAt(m.index + m[0].length)
-            },
-            message: `${m[0]} is all uppercase.`,
-            source: "ex"
-        };
-
-        if (has_diagnostic_related_information_capability) {
-            diagnostic.relatedInformation = [
-                {
-                    location: {
-                        uri: text_document.uri,
-                        range: Object.assign({}, diagnostic.range)
-                    },
-                    message: "Check your spelling. Spelling is important."
-                },
-                {
-                    location: {
-                        uri: text_document.uri,
-                        range: Object.assign({}, diagnostic.range)
-                    },
-                    message: "Particularly only for names."
-                }
-            ];
-        }
-
-        diagnostics.push(diagnostic);
-    }
-
-    server_connection.sendDiagnostics({
-        uri: text_document.uri,
-        diagnostics
-    });
-}
 
 server_connection.onDidChangeWatchedFiles(change => {
     server_connection.console.log("Received a file change event.");
