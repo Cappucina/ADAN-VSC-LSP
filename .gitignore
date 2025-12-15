@@ -3,3 +3,7 @@ node_modules/
 *.js
 *.js.map
 out/
+bun.lock
+yarn.lock
+package-lock.json
+.DS_Store
