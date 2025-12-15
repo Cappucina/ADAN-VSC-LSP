@@ -11,7 +11,27 @@
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
-  "contributes": {},
+  "icon": "images/adan-icon.png",
+  "contributes": {
+    "commands": [],
+    "languages": [
+      {
+        "id": "adan",
+        "aliases": [
+          "ADAN",
+          "adan"
+        ],
+        "extensions": [
+          ".adan",
+          ".adn"
+        ],
+        "icon": {
+          "light": "./images/adan-light.svg",
+          "dark": "./images/adan-dark.svg"
+        }
+      }
+    ]
+  },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
