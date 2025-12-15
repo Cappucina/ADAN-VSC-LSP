@@ -6,3 +6,4 @@ bun.lock
 yarn.lock
 package-lock.json
 .DS_Store
+*.vsix
