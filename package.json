@@ -14,15 +14,8 @@
   },
   "publisher": "Cappucina",
   "activationEvents": [],
-<<<<<<< HEAD
-  "main": "./out/extension.js",
-  "icon": "images/adan-icon.png",
-  "contributes": {
-    "commands": [],
-=======
   "main": "./out/src/extension.js",
   "contributes": {
->>>>>>> 26ccb0ed41157a8b5424bb9394ed26406b4c77fa
     "languages": [
       {
         "id": "adan",
@@ -31,15 +24,6 @@
           "adan"
         ],
         "extensions": [
-<<<<<<< HEAD
-          ".adan",
-          ".adn"
-        ],
-        "icon": {
-          "light": "./images/adan-light.svg",
-          "dark": "./images/adan-dark.svg"
-        }
-=======
           ".adn"
         ],
         "configuration": "./language-configuration.json"
@@ -50,7 +34,6 @@
         "language": "adan",
         "scopeName": "source.adn",
         "path": "./syntax/adan.tmLanguage.json"
->>>>>>> 26ccb0ed41157a8b5424bb9394ed26406b4c77fa
       }
     ]
   },
