@@ -14,6 +14,7 @@ import { ServerSettings } from "./settings.js";
 import { snippet_keywords } from "./snippets/keywords.js";
 import { snippet_types } from "./snippets/types.js";
 import { snippet_constants } from "./snippets/constants.js";
+import { snippet_generic_snippets } from "./snippets/generic.js";
 
 let server_connection = createConnection(ProposedFeatures.all);
 let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -88,11 +89,13 @@ server_connection.onDidChangeWatchedFiles(change => {
 const keywords: CompletionItem[] = snippet_keywords;
 const types: CompletionItem[] = snippet_types;
 const constants: CompletionItem[] = snippet_constants;
+const generic_snippets: CompletionItem[] = snippet_generic_snippets;
 
 const all_completions: CompletionItem[] = [
     ...keywords,
     ...types,
     ...constants,
+    ...generic_snippets
 ];
 
 server_connection.onCompletion((text_document_position: TextDocumentPositionParams): CompletionItem[] => {

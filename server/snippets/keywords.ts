@@ -81,14 +81,5 @@ export const snippet_keywords: CompletionItem[] = [
 
         insertText: "program::${1:void} ${2:function_name}(${3:parameters}) {\n\t${0}\n}",
         insertTextFormat: InsertTextFormat.Snippet
-    },
-    {
-        label: "init",
-        kind: CompletionItemKind.Keyword,
-        detail: "Define starting point of a ADAN program.",
-        documentation: "```adan\ninclude adan.io;\n\nprogram::int main() {\n\treturn 0;\n}\n```",
-
-        insertText: "include adan.io;\n\nprogram::void main() {\n\treturn;\n}",
-        insertTextFormat: InsertTextFormat.Snippet
     }
 ];
