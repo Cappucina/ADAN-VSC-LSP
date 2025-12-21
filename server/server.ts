@@ -8,6 +8,7 @@ import {
     TextDocumentPositionParams,
     TextDocumentSyncKind,
     InitializeResult,
+    CompletionItemKind,
 } from "vscode-languageserver/node";
 import { TextDocument, Range, Position } from "vscode-languageserver-textdocument";
 import { ServerSettings, SymbolTable, SymbolEntry, SymbolReference } from "./types/index.js";
@@ -77,23 +78,6 @@ server_connection.onDidChangeWatchedFiles(change => {
     server_connection.console.log("Received a file change event.");
 });
 
-const keywords: CompletionItem[] = snippet_keywords;
-const types: CompletionItem[] = snippet_types;
-const constants: CompletionItem[] = snippet_constants;
-const generic_snippets: CompletionItem[] = snippet_generic_snippets;
-const all_completions: CompletionItem[] = [...keywords, ...types, ...constants, ...generic_snippets];
-
-server_connection.onCompletion((text_document_position: TextDocumentPositionParams): CompletionItem[] => {
-    const document = documents.get(text_document_position.textDocument.uri);
-    if (!document) return all_completions;
-    const text = document.getText();
-    const offset = document.offsetAt(text_document_position.position);
-    const line_start = text.lastIndexOf('\n', offset - 1) + 1;
-    const line_text = text.substring(line_start, offset);
-    if (line_text.trim().endsWith("::") || line_text.match(/::\s*$/)) return types;
-    return all_completions;
-});
-
 server_connection.onCompletionResolve((item: CompletionItem): CompletionItem => item);
 
 const getWordRangeAtPosition = (document: TextDocument, position: Position): Range | null => {
@@ -159,8 +143,6 @@ documents.onDidChangeContent(change => {
         };
     }
 
-
-
     const regexCall = /\b(\w+)\s*(\([^)]*\))/g;
     let matchCall;
     while ((matchCall = regexCall.exec(text)) !== null) {
@@ -189,7 +171,6 @@ documents.onDidChangeContent(change => {
                 }
             }
         });
-
 });
 
 server_connection.onRenameRequest(params => {
@@ -215,6 +196,69 @@ server_connection.onRenameRequest(params => {
     });
 
     return { changes };
+});
+
+const keywords: CompletionItem[] = snippet_keywords;
+const types: CompletionItem[] = snippet_types;
+const constants: CompletionItem[] = snippet_constants;
+const generic_snippets: CompletionItem[] = snippet_generic_snippets;
+const all_completions: CompletionItem[] = [...keywords, ...types, ...constants, ...generic_snippets];
+
+server_connection.onCompletion((text_document_position: TextDocumentPositionParams): CompletionItem[] => {
+    const document = documents.get(text_document_position.textDocument.uri);
+    if (!document) return all_completions;
+    
+    const text = document.getText();
+    const offset = document.offsetAt(text_document_position.position);
+    const line_start = text.lastIndexOf('\n', offset - 1) + 1;
+    const line_text = text.substring(line_start, offset);
+    const functionCompletions: CompletionItem[] = [];
+    const variableCompletions: CompletionItem[] = [];
+
+    const functionCallRegex = /\b(\w+)\s*\(/g;
+    let matchCall;
+    while ((matchCall = functionCallRegex.exec(line_text)) !== null) {
+        const funcName = matchCall[1];
+        
+        const entry = symbolTable[funcName];
+        if (entry && entry.type === 'function') {
+            functionCompletions.push({
+                label: funcName,
+                kind: CompletionItemKind.Function,
+                detail: `Function call for ${funcName}`,
+                documentation: `Call the function ${funcName}`,
+            });
+        }
+    }
+    const symbolRegex = /\b(\w+::\w+)\b/g;
+    let matchSymbol;
+    while ((matchSymbol = symbolRegex.exec(text)) !== null) {
+        const fullSymbol = matchSymbol[1];
+        const symbolParts = fullSymbol.split('::');
+        const symbolName = symbolParts[0];
+        const symbolType = symbolParts[1];
+        
+        const entry = symbolTable[fullSymbol];
+        if (entry) {
+            if (entry.type === 'function') {
+                variableCompletions.push({
+                    label: symbolName,
+                    kind: CompletionItemKind.Function,
+                    detail: `Function: ${symbolName}`,
+                    documentation: `Function definition for ${symbolName}`,
+                });
+            } else {
+                variableCompletions.push({
+                    label: symbolName,
+                    kind: CompletionItemKind.Variable,
+                    detail: `Variable: ${symbolName}`,
+                    documentation: `Variable definition for ${symbolName}`,
+                });
+            }
+        }
+    }
+    
+    return { ...all_completions, ...functionCompletions, ...variableCompletions };
 });
 
 documents.listen(server_connection);
