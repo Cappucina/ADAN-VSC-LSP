@@ -37,6 +37,7 @@ include adan.io;
 
 program::int main(int::argc, string::argv) {
 
+	return 0;
 }
 ```
 
