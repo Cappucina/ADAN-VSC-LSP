@@ -25,7 +25,6 @@ Or, if you'd like, directly install the `.vsix` file from the [releases page](ht
 Turn something from this:
 ```
 init
-}
 ```
 
 Into this:
