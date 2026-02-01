@@ -23,17 +23,19 @@ Or, if you'd like, directly install the `.vsix` file from the [releases page](ht
 - - Increase your development speed with easily editable pre-built blocks of code.
 
 Turn something from this:
-```c
-include adan.io;
-
-pro
+```
+init
+}
 ```
 
 Into this:
+
+[//]: <> (Our languge needs to be bigger to do this properly so I just used C as github doesn't have the same support as lets say discord)
+
 ```c
 include adan.io;
 
-program::void my_function(parameters) {
+program::int main(int::argc, string::argv) {
 
 }
 ```
